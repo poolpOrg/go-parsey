@@ -9,4 +9,4 @@ It differs from `parse.y` in that it doesn't generate a parser at compile time,
 but lets you configure the lexer and grammar dynamically.
 
 For example of use,
-see the [example program](https://github.com/poolpOrg/go-parsey/blob/main/example/example.go)
+see the [example program](https://github.com/poolpOrg/go-parsey/blob/master/example/example.go)
