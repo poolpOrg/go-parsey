@@ -24,8 +24,8 @@ import (
 type TokenType string
 
 type Lexer struct {
-	tokens   map[TokenType]func(string) bool
-	keywords map[string]bool
+	tokens      map[TokenType]func(string) bool
+	tokensMatch map[TokenType]func(string) bool
 }
 
 type Token struct {
@@ -34,22 +34,29 @@ type Token struct {
 }
 
 func NewLexer() *Lexer {
-	return &Lexer{tokens: make(map[TokenType]func(string) bool), keywords: make(map[string]bool)}
+	return &Lexer{tokens: make(map[TokenType]func(string) bool), tokensMatch: make(map[TokenType]func(string) bool)}
 }
 
-func (lexer *Lexer) RegisterTokenType(token TokenType, detector func(string) bool) error {
+func (lexer *Lexer) RegisterToken(token TokenType) error {
 	if _, exists := lexer.tokens[token]; !exists {
-		lexer.tokens[token] = detector
+		lexer.tokens[token] = func(tokenName string) bool { return TokenType(tokenName) == token }
+	}
+	return nil
+}
+
+func (lexer *Lexer) RegisterTokenMatch(token TokenType, detector func(string) bool) error {
+	if _, exists := lexer.tokensMatch[token]; !exists {
+		lexer.tokensMatch[token] = detector
 	}
 	return nil
 }
 
 func (lexer *Lexer) GetTokenType(buffer string) TokenType {
-	if _, exists := lexer.keywords[buffer]; exists {
+	if _, exists := lexer.tokens[TokenType(buffer)]; exists {
 		return TokenType(buffer)
 	}
 
-	for tokenType, tokenValidator := range lexer.tokens {
+	for tokenType, tokenValidator := range lexer.tokensMatch {
 		if tokenValidator(buffer) {
 			return tokenType
 		}
@@ -100,18 +107,6 @@ func (lexer *Lexer) Tokenize(buffer string) ([]Token, error) {
 	}
 
 	return tokens, nil
-}
-
-func (lexer *Lexer) RegisterKeyword(keyword string) error {
-	if _, exists := lexer.keywords[keyword]; !exists {
-		lexer.keywords[keyword] = true
-	}
-	return nil
-}
-
-func (lexer *Lexer) IsKeyword(buffer string) bool {
-	_, exists := lexer.keywords[buffer]
-	return exists
 }
 
 func (lexer *Lexer) IsString(buffer string) bool {

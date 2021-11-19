@@ -64,11 +64,13 @@ func (config *Configuration) ParseReader(rd *bufio.Reader) (bool, error) {
 			continue
 		}
 
-		if !config.grammar.Match(tokens) {
+		handler := config.grammar.Match(tokens)
+		if handler == nil {
 			fmt.Println("error on line", i, ":", line)
 			success = false
 			continue
 		}
+		handler(config, tokens)
 	}
 }
 

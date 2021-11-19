@@ -21,7 +21,7 @@ type Grammar struct {
 }
 
 type Rule struct {
-	handler func()
+	handler func(*Configuration, []Token) error
 	tokens  []TokenType
 }
 
@@ -31,7 +31,7 @@ func NewGrammar() *Grammar {
 	return grammar
 }
 
-func (grammar *Grammar) RegisterRule(handler func(), tokens ...interface{}) {
+func (grammar *Grammar) RegisterRule(handler func(*Configuration, []Token) error, tokens ...interface{}) {
 	rule := Rule{}
 	rule.handler = handler
 	rule.tokens = make([]TokenType, 0)
@@ -44,7 +44,7 @@ func (grammar *Grammar) RegisterRule(handler func(), tokens ...interface{}) {
 	grammar.rules = append(grammar.rules, rule)
 }
 
-func (grammar *Grammar) Match(tokens []Token) bool {
+func (grammar *Grammar) Match(tokens []Token) func(*Configuration, []Token) error {
 	matched := false
 	for _, rule := range grammar.rules {
 		if len(rule.tokens) != len(tokens) {
@@ -61,9 +61,8 @@ func (grammar *Grammar) Match(tokens []Token) bool {
 			}
 		}
 		if matched {
-			rule.handler()
-			return true
+			return rule.handler
 		}
 	}
-	return false
+	return nil
 }

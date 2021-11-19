@@ -24,6 +24,14 @@ import (
 	"github.com/poolpOrg/go-parsey"
 )
 
+func configBuilderRule1(config *parsey.Configuration, tokens []parsey.Token) error {
+	return nil
+}
+
+func configBuilderRule2(config *parsey.Configuration, tokens []parsey.Token) error {
+	return nil
+}
+
 func main() {
 	var configFile string
 
@@ -31,16 +39,17 @@ func main() {
 	flag.Parse()
 
 	lexer := parsey.NewLexer()
-	lexer.RegisterKeyword("listen")
-	lexer.RegisterKeyword("on")
-	lexer.RegisterKeyword("=>")
-	lexer.RegisterTokenType("STRING", lexer.IsString)
-	lexer.RegisterTokenType("NUMBER", lexer.IsNumber)
-	lexer.RegisterTokenType("FLOAT", lexer.IsFloat)
+	lexer.RegisterToken("listen")
+	lexer.RegisterToken("on")
+	lexer.RegisterToken("match")
+	lexer.RegisterToken("=>")
+	lexer.RegisterTokenMatch("STRING", lexer.IsString)
+	lexer.RegisterTokenMatch("NUMBER", lexer.IsNumber)
+	lexer.RegisterTokenMatch("FLOAT", lexer.IsFloat)
 
 	grammar := parsey.NewGrammar()
-	grammar.RegisterRule(func() { fmt.Println("HOORAY") }, "listen", "on", "STRING")
-	grammar.RegisterRule(func() { fmt.Println("HOORAY") }, "STRING", "=>", "STRING")
+	grammar.RegisterRule(configBuilderRule1, "listen", "on", "STRING")
+	grammar.RegisterRule(configBuilderRule2, "match", "=>", "STRING")
 
 	config := parsey.NewConfiguration(lexer, grammar)
 
