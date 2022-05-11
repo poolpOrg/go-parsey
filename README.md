@@ -1,7 +1,6 @@
-# ipcmsg
+# parsey
 
-**WIP:**
-This is work in progress, do not use for anything serious.
+**DISCONTINUED**
 
 The `parsey` package is meant to help supporting line-based configuration files similar to OpenBSD's look and feel.
 
